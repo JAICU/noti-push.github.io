@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es" class="light dark">
+
+<head>
+
+  <meta charset="UTF-8">
+  <title>Modificar - LibroPush</title>
+
+  <script src="js/registraServiceWorker.js"></script>
+
+  <meta name="viewport" content="width=device-width">
+  <meta name="theme-color" content="#fffbfe">
+  <link rel="icon" sizes="48x48" href="favicon.ico">
+  <link rel="manifest" href="site.webmanifest">
+  <script src="ungap/custom-elements.js"></script>
+
+  <script type="module" src="js/configura.js"></script>
+  <link rel="stylesheet" href="css/estilos.css">
+  <link rel="stylesheet" href="css/transicion_pestanas.css">
+  <script type="module" src="lib/js/submitForm.js"></script>
+  <script type="module" src="lib/js/muestraError.js"></script>
+  <script type="module" src="lib/js/consumeJson.js"></script>
+  <script type="module" src="lib/js/muestraObjeto.js"></script>
+
+  <script>
+    // Obtiene los parámetros de la página.
+    const params = new URL(location.href).searchParams
+  </script>
+
+</head>
+
+<body onload="if (params.size > 0) {
+  consumeJson('srv/libro.php?' + params)
+   .then(respuesta => muestraObjeto(forma, respuesta.body))
+   .catch(muestraError)
+ }">
+
+
+  <form id="forma" onsubmit="submitForm('srv/libro-modifica.php', event)
+   .then(respuesta => location.href = 'index.html')
+   .catch(muestraError)">
+
+    <md-top-app-bar adicional="tab" headline="headline">
+
+      <a href="index.html">
+        <button class="md-standard-icon-button" type="button" title="Cancelar" slot="navigation">
+          <span class="material-symbols-outlined">cancel</span>
+        </button>
+      </a>
+      <button class="md-standard-icon-button" type="submit" title="Guardar" slot="action">
+        <span class="material-symbols-outlined">save</span>
+      </button>
+
+      <button is="md-overflow-button" slot="action" onclick="overflow.alterna(this)"></button>
+
+    </md-top-app-bar>
+    <h1 id="headline">Modificar datos</h1>
+    <nav-tab-fixed id="tab"></nav-tab-fixed>
+
+
+    <main>
+      <!-- <button class="md-outline-button"><a href="index.html">Cancelar</a></button> -->
+      <input name="id" type="hidden">
+
+      <p>
+        <label class="md-filled-text-field">
+          <input required value="Cargando&hellip;" name="titulo">
+          <span>Título del libro *</span>
+          <small>Obligatorio</small>
+        </label>
+      </p>
+
+      <p>
+        <label class="md-filled-text-field">
+          <input required value="Cargando&hellip;" name="autor">
+          <span>Autor del libro *</span>
+          <small>Obligatorio</small>
+        </label>
+      </p>
+      <p>
+        <label class="md-filled-text-field">
+          <input required value="Cargando&hellip;" name="isbn">
+          <span>ISBN del libro *</span>
+          <small>Obligatorio</small>
+        </label>
+      </p>
+      <p>
+        <label class="md-filled-text-field">
+          <input required value="Cargando&hellip;" name="editorial">
+          <span>Editorial del libro *</span>
+          <small>Obligatorio</small>
+        </label>
+      </p>
+  </form>
+  </main>
+  <md-overflow-menu id="overflow">
+
+    <button type="button" onclick="
+    if (params.size > 0 && confirm('Confirma la eliminación')) {
+     consumeJson('srv/libro-elimina.php?' + params)
+      .then(() => location.href = 'index.html')
+      .catch(muestraError)
+    }">
+      <span class="material-symbols-outlined"> delete</span> Eliminar
+    </button>
+
+  </md-overflow-menu>
+  <nav-drw></nav-drw>
+</body>
+
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es" class="light dark">
+
+<head>
+
+  <meta charset="UTF-8">
+  <title>Agregar - LibroPush</title>
+
+  <script src="js/registraServiceWorker.js"></script>
+
+  <meta name="viewport" content="width=device-width">
+  <meta name="theme-color" content="#fffbfe">
+  <link rel="icon" sizes="48x48" href="favicon.ico">
+  <link rel="manifest" href="site.webmanifest">
+  <script src="ungap/custom-elements.js"></script>
+  <script type="module" src="js/configura.js"></script>
+  <link rel="stylesheet" href="css/estilos.css">
+  <link rel="stylesheet" href="css/transicion_pestanas.css">
+  <script type="module" src="lib/js/submitForm.js"></script>
+  <script type="module" src="lib/js/muestraError.js"></script>
+
+</head>
+
+
+<body>
+  
+  <form onsubmit="submitForm('srv/libro-agrega.php', event)
+    .then(modelo => location.href = 'index.html')
+    .catch(muestraError)">
+    <md-top-app-bar adicional="tab" headline="headline">
+      <a href="index.html">
+        <button class="md-standard-icon-button" type="button" title="Cancelar" slot="navigation">
+          <span class="material-symbols-outlined">cancel</span>
+        </button>
+      </a>
+
+      <button class="md-standard-icon-button" type="submit" title="Agregar" slot="action">
+        <span class="material-symbols-outlined">save</span>
+      </button>
+    </md-top-app-bar>
+
+    <h1 id="headline">Agregar Libro</h1>
+    <nav-tab-fixed id="tab"></nav-tab-fixed>
+    <main>
+
+      <!-- <button class="md-outline-button"><a href="index.html">Cancelar</a></button> -->
+      <p>
+        <label class="md-filled-text-field">
+          <input required placeholder="Título*" name="titulo">
+          <span>Título del libro *</span>
+          <small>Obligatorio</small>
+        </label>
+      </p>
+      <p>
+
+      <p>
+        <label class="md-filled-text-field">
+          <input required placeholder="Autor*" name="autor">
+          <span>Autor del libro *</span>
+          <small>Obligatorio</small>
+        </label>
+      </p>
+      <p>
+
+      <p>
+        <label class="md-filled-text-field">
+          <input required placeholder="ISBN*" name="isbn">
+          <span>ISBN del libro *</span>
+          <small>Obligatorio</small>
+        </label>
+      </p>
+      <p>
+
+      <p>
+        <label class="md-filled-text-field">
+          <input required placeholder="Editorial*" name="editorial">
+          <span>Editorial del libro*</span>
+          <small>Obligatorio</small>
+        </label>
+      </p>
+      <!-- <p>
+        <button class="md-filled-button" style="width: 100%;" type="submit">Agregar</button>
+      </p> -->
+    </main>
+
+    <nav-drw></nav-drw>
+
+</body>
+
+</html>

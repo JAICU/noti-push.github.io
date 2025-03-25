@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es" class="light dark">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Notificaciones - LibroPush</title>
+
+    <script src="js/registraServiceWorker.js"></script>
+
+    <meta name="viewport" content="width=device-width" />
+    <meta name="theme-color" content="#fffbfe" />
+    <link rel="icon" sizes="48x48" href="favicon.ico" />
+    <link rel="manifest" href="site.webmanifest" />
+    <script src="ungap/custom-elements.js"></script>
+
+    <script type="module" src="js/configura.js"></script>
+    <link rel="stylesheet" href="css/estilos.css" />
+    <link rel="stylesheet" href="css/transicion_pestanas.css" />
+    <script type="module" src="lib/js/consumeJson.js"></script>
+    <script type="module" src="lib/js/muestraObjeto.js"></script>
+    <script type="module" src="lib/js/muestraError.js"></script>
+
+    <link rel="stylesheet" href="css/dark-hc.css" />
+    <link rel="stylesheet" href="css/dark-mc.css" />
+    <link rel="stylesheet" href="css/dark.css" />
+    <link rel="stylesheet" href="css/light-hc.css" />
+    <link rel="stylesheet" href="css/light-mc.css" />
+    <link rel="stylesheet" href="css/light.css" />
+  </head>
+
+  <md-top-app-bar adicional="tab" headline="headline"> </md-top-app-bar>
+
+  <md-top-app-bar class="center-aligned">
+    <h1 id="headline">Notificaciones</h1>
+  </md-top-app-bar>
+
+  <nav-tab-fixed id="tab"></nav-tab-fixed>
+
+  <body onload="preparaVista()">
+    <menu style="display: flex; list-style: none; flex-wrap: wrap; gap: 0.5rem">
+      <li>
+        <button
+          class="custom-button"
+          id="btnSuscribe"
+          type="button"
+          hidden
+          onclick="suscribe()"
+        >
+          Suscríbete
+        </button>
+      </li>
+      <li>
+        <button
+          class="custom-button"
+          id="btnCancela"
+          type="button"
+          hidden
+          onclick="cancela()"
+        >
+          Cancela suscripción
+        </button>
+      </li>
+      <!-- <li>
+        <button
+          class="custom-button"
+          id="btnNotifica"
+          type="button"
+          hidden
+          onclick="notificaDesdeElServidor()"
+        >
+          Notifica
+        </button>
+      </li> -->
+    
+    
+      <!--
+
+     <li>
+     <a class="custom-button" href="srv/genera-llaves.php" target="_blank">Genera llaves</a>
+    </li>
+    
+    -->
+  </menu>
+
+      <!--
+     <div class="container">
+      <h2>Enviar Notificación</h2>
+      <div class="input-field">
+        <textarea id="mensaje" placeholder="Escribe tu mensaje aquí..." required></textarea>
+      </div>
+      <button class="custom-button" id="btnNotifica" type="button" onclick="notificaDesdeElServidor()">Enviar Notificación</button>
+    </div>
+    -->
+
+      <div  class="container">
+        <h2 >Mensaje</h2>
+        <div class="input-field">
+          <textarea
+            id="mensaje"
+            placeholder="Escribe tu mensaje aquí..."
+            required
+          ></textarea>
+        </div>
+        <button
+          class="custom-button"
+          id="btnNotifica"
+          type="button"
+          onclick="notificaDesdeElServidor()"
+        >
+          Enviar Notificación
+        </button>
+      </div>
+
+      <script>
+        async function notificaDesdeElServidor() {
+   try {
+     const mensaje = document.getElementById("mensaje").value;
+     if (!mensaje) {
+       alert("Por favor, escribe un mensaje antes de enviar.");
+       return;
+     }
+ 
+     document.getElementById("btnNotifica").innerHTML =
+       '<progress max="100">Cargando&hellip;</progress>';
+ 
+     const response = await fetch("srv/notifica.php", {
+       method: "POST",
+       headers: {
+         "Content-Type": "application/json",
+       },
+       body: JSON.stringify({ mensaje }),
+     });
+ 
+     const responseText = await response.text(); // Captura la respuesta
+     console.log("Respuesta del servidor:", responseText);
+ 
+     try {
+       const render = JSON.parse(responseText); // Asegurar que se parsea correctamente
+       if (!render || !render.body) {
+         throw new Error("Respuesta inválida del servidor");
+       }
+       await muestraObjeto(document, render.body);
+     } catch (jsonError) {
+       throw new Error("Error procesando JSON: " + jsonError.message);
+     }
+   } catch (error) {
+    /// muestraError("Prueba de error");
+   } finally {
+     document.getElementById("btnNotifica").innerHTML =
+       "Enviar Notificación";
+   }
+ }
+ 
+       </script>
+
+      <!---->
+    </menu>
+
+    <p>
+      <output id="outEstado">
+        <progress max="100">Cargando&hellip;</progress>
+      </output>
+    </p>
+
+    <script type="module">
+      import { exportaAHtml } from "./lib/js/exportaAHtml.js";
+      import { activaNotificacionesPush } from "./lib/js/activaNotificacionesPush.js";
+      import { getSuscripcionPush } from "./lib/js/getSuscripcionPush.js";
+      import { suscribeAPush } from "./lib/js/suscribeAPush.js";
+      import { cancelaSuscripcionPush } from "./lib/js/cancelaSuscripcionPush.js";
+      import { consumeJson } from "./lib/js/consumeJson.js";
+      import { enviaJson } from "./lib/js/enviaJson.js";
+      import { muestraError } from "./lib/js/muestraError.js";
+      import { muestraObjeto } from "./lib/js/muestraObjeto.js";
+      import { urlBase64ToUint8Array } from "./lib/js/urlBase64ToUint8Array.js";
+      import { calculaDtoParaSuscripcion } from "./lib/js/calculaDtoParaSuscripcion.js";
+
+      const applicationServerKey = urlBase64ToUint8Array(
+        "BMBlr6YznhYMX3NgcWIDRxZXs0sh7tCv7_YCsWcww0ZCv9WGg-tRCXfMEHTiBPCksSqeve1twlbmVAZFv7GSuj0"
+      );
+      /** @enum {string} */
+      const Estado = {
+        CALCULANDO: "Calculando…",
+        SUSCRITO: "Suscrito",
+        DESUSCRITO: "Sin suscripción",
+        INCOMPATIBLE: "Incompatible",
+      };
+
+      async function preparaVista() {
+        try {
+          await activaNotificacionesPush("sw.js");
+          const suscripcion = await getSuscripcionPush();
+          if (suscripcion === null) {
+            muestraEstado(Estado.DESUSCRITO);
+          } else {
+            // Modifica la suscripción en el servidor,
+            const dto = calculaDtoParaSuscripcion(suscripcion);
+            await enviaJson("srv/suscripcion-modifica.php", dto);
+            muestraEstado(Estado.SUSCRITO);
+          }
+        } catch (error) {
+          muestraEstado(Estado.INCOMPATIBLE);
+          muestraError(error);
+        }
+      }
+      exportaAHtml(preparaVista);
+
+      /**
+       async function notificaDesdeElServidor() {
+     try {
+      reporte.innerHTML =
+      `<progress max="100">Cargando&hellip;</progress>`
+      const render = await consumeJson("srv/notifica.php")
+      await muestraObjeto(document, render.body)
+     } catch (error) {
+      muestraError(error)
+     }
+    }
+    exportaAHtml(notificaDesdeElServidor)
+     
+     */
+
+      async function suscribe() {
+        try {
+          muestraEstado(Estado.CALCULANDO);
+          const suscripcion = await suscribeAPush(applicationServerKey);
+          // Agrega la suscripción al servidor,
+          const dto = calculaDtoParaSuscripcion(suscripcion);
+          await enviaJson("srv/suscripcion-modifica.php", dto);
+          muestraEstado(Estado.SUSCRITO);
+        } catch (error) {
+          muestraError(error);
+        }
+      }
+      exportaAHtml(suscribe);
+
+      async function cancela() {
+        try {
+          muestraEstado(Estado.CALCULANDO);
+          const suscripcion = await cancelaSuscripcionPush();
+          if (suscripcion !== null) {
+            // Elimina la suscripción en el servidor,
+            const dto = calculaDtoParaSuscripcion(suscripcion);
+            await enviaJson("srv/suscripcion-elimina.php", dto);
+            muestraEstado(Estado.DESUSCRITO);
+          }
+        } catch (error) {
+          muestraError(error);
+        }
+      }
+      exportaAHtml(cancela);
+
+      /** @param {Estado} estado */
+      function muestraEstado(estado) {
+        outEstado.value = estado;
+        if (estado === Estado.INCOMPATIBLE || estado === Estado.CALCULANDO) {
+          btnSuscribe.hidden = true;
+          btnCancela.hidden = true;
+          btnNotifica.hidden = true;
+        } else if (estado === Estado.SUSCRITO) {
+          btnSuscribe.hidden = true;
+          btnCancela.hidden = false;
+          btnNotifica.hidden = false;
+        } else if (estado === Estado.DESUSCRITO) {
+          btnSuscribe.hidden = false;
+          btnCancela.hidden = true;
+          btnNotifica.hidden = true;
+        }
+      }
+    </script>
+  </body>
+</html>
